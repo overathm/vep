@@ -106,7 +106,7 @@ if [ $(df -P . | tail -1 | xargs | cut -d" " -f4) -lt 5000000 ];then
 fi
 
 #check for whitespaces and repaces them with underscore
-for f in $(find input/ -name '*\ *.vcf')
+for f in input/*\ *
 do
   mv "$f" "${f// /_}"
   printf "I don't like whitespaces: $f is renamed to ${f// /_}"
