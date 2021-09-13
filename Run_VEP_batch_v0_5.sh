@@ -106,17 +106,22 @@ if [ $(df -P . | tail -1 | xargs | cut -d" " -f4) -lt 5000000 ];then
 fi
 
 #check for whitespaces and repaces them with underscore
-for f in input/*\ *
+SAVEIFS=$IFS
+IFS=$'\n'
+for f in $(find input/ -name '*\ *.vcf')
 do
   mv "$f" "${f// /_}"
   printf "I don't like whitespaces: $f is renamed to ${f// /_}"
 done
+IFS=$SAVEIFS
 
 #for every file that ends with .vfc that stayed ther for longer than timeout (that value is stored in the config)
 for i in $(find input/ -name '*.vcf' -mmin +$waitperiod)
   do
-    BASENAME=$( echo $i | cut -d'/' -f2)
-    out_name=${BASENAME}_VEP_RefSeq.vcf
+    #BASENAME=$( echo $i | cut -d'/' -f2)
+    basename=${i##*/}
+    basename_we=$( echo $basename | cut -d'.' -f1)
+    outname=${basename_we}_VEP_RefSeq.vcf
 
     cp $i archive
     if [ $? -eq 0 ];then
@@ -130,6 +135,7 @@ for i in $(find input/ -name '*.vcf' -mmin +$waitperiod)
     #will not change at all the rest of the script, I will check the different outputfiles available by VEP to check for problems
     #during the run or a .log file
 
+    echo $(date +%T) >> archive/logs/$(date +"%Y%m%d")docker.log
 
     (docker exec -i ${docker_con} /bin/bash -c "./vep\
     --offline \
@@ -142,12 +148,12 @@ for i in $(find input/ -name '*.vcf' -mmin +$waitperiod)
     --force_overwrite \
     --dir_cache ${mount_dir}/reference \
     --input_file ${mount_dir}/$i \
-    -output_file ${mount_dir}/output/$out_name ; chmod 666 ${mount_dir}/output/*" ) >> archive/logs/$(date +"%Y%m%d")docker.log
+    -output_file ${mount_dir}/output/$outname ; chmod 666 ${mount_dir}/output/$outname ; chmod 666 ${mount_dir}/output/${outname}_summary.html"  ) >> archive/logs/$(date +"%Y%m%d")docker.log
 
-    if [ -f archive/$BASENAME ] && [ -f output/$out_name ];then
+    if [ -f archive/$basename ] && [ -f output/$outname ];then
       rm $i
     else
-      printf "$BASENAME doesn't exist in archive or output, so it could not be deleted\n"
+      printf "$basename doesn't exist in archive or output, so it could not be deleted\n"
     fi
   done
 
@@ -155,5 +161,3 @@ printf "docker stop "
 docker stop $docker_con
 printf "docker rm "
 docker rm $docker_con
-
-#end
