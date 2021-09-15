@@ -118,26 +118,26 @@ IFS=$SAVEIFS
 #for every file that ends with .vfc that stayed ther for longer than timeout (that value is stored in the config)
 for i in $(find input/ -name '*.vcf' -mmin +$waitperiod)
   do
-  basename=${i##*/}
-  basename_we=$( echo $basename | cut -d'.' -f1)
-  outname=${basename_we}_VEP_RefSeq.vcf
-  output_one=${basename_we}_one_VEP_RefSeq.vcf
+    #BASENAME=$( echo $i | cut -d'/' -f2)
+    basename=${i##*/}
+    basename_we=$( echo $basename | cut -d'.' -f1)
+    outname=${basename_we}_VEP_RefSeq.vcf
 
+    cp $i archive
+    if [ $? -eq 0 ];then
+      printf "file $i is copied to archive\n"
+    else
+      printf "ERROR: the file $i cannot be copied into the archive\nEXIT\n"
+      exit
+    fi
 
-  cp $i archive
-  if [ $? -eq 0 ];then
-    printf "file $i is copied to archive\n"
-  else
-    printf "ERROR: the file $i cannot be copied into the archive\nEXIT\n"
-    exit
-  fi
+    #The options of the vep script below can still be modified based on what we decide as final output, these changes however
+    #will not change at all the rest of the script, I will check the different outputfiles available by VEP to check for problems
+    #during the run or a .log file
 
-  #The options of the vep script below can still be modified based on what we decide as final output, these changes however
-  #will not change at all the rest of the script, I will check the different outputfiles available by VEP to check for problems
-  #during the run or a .log file
+    echo $(date +%T) >> archive/logs/$(date +"%Y%m%d")docker.log
 
-  echo $(date +%T) >> archive/logs/$(date +"%Y%m%d")docker.log
-  (docker exec -i ${docker_con} /bin/bash -c "./vep\
+    (docker exec -i ${docker_con} /bin/bash -c "./vep\
   -input_file ${mount_dir}/$i \
   --offline \
   --cache \
@@ -150,15 +150,12 @@ for i in $(find input/ -name '*.vcf' -mmin +$waitperiod)
   --vcf \
   --force_overwrite \
   --no_stats \
-  -output_file ${mount_dir}/output/$outname_one" \
-
-
-  docker exec -i ${docker_con} /bin/bash -c "./filter_vep \
-  --input_file ${mount_dir}/output/$outname_one
-  --force_overwrite \
-  --filter \"Feature matches NM_002529 or Feature matches NM_006180 or Feature matches NM_001012338 or Feature matches NM_020975 or Feature matches NM_005343 or Feature matches NM_000455 or Feature matches NM_203500 or Feature matches NM_004304 or Feature matches NM_004333 or Feature matches NM_001904 or Feature matches NM_005228 or Feature matches NM_023110 or (Feature matches NM_000141 and EXON is 8/18)or Feature matches NM_022970 or Feature matches NM_000142 or Feature matches NM_213647 or Feature matches NM_004448 or Feature matches NM_033360 or Feature matches NM_002755 or Feature matches NM_001127500 or Feature matches NM_002524 or Feature matches NM_006218 or Feature matches NM_000314 or Feature matches NM_000546 or Feature matches NM_002944 or Feature matches NM_005896 or Feature matches NM_002168\" \
-  --only_matched \
-  -output_file ${mount_dir}/output/$outname ; chmod 666 ${mount_dir}/output/$outname ; chmod 666 ${mount_dir}/output/${outname}_summary.html" ) >> archive/logs/$(date +"%Y%m%d")docker.log
+  -o stdout | \
+./filter_vep \
+--force_overwrite  \
+--filter 'Feature matches NM_002529 or Feature matches NM_006180 or Feature matches NM_001012338 or Feature matches NM_020975 or Feature matches NM_005343 or Feature matches NM_000455 or Feature matches NM_203500 or Feature matches NM_004304 or Feature matches NM_004333 or Feature matches NM_001904 or Feature matches NM_005228 or Feature matches NM_023110 or (Feature matches NM_000141 and EXON is 8/18)or Feature matches NM_022970 or Feature matches NM_000142 or Feature matches NM_213647 or Feature matches NM_004448 or Feature matches NM_033360 or Feature matches NM_002755 or Feature matches NM_001127500 or Feature matches NM_002524 or Feature matches NM_006218 or Feature matches NM_000314 or Feature matches NM_000546 or Feature matches NM_002944 or Feature matches NM_005896 or Feature matches NM_002168' \
+ --only_matched \
+  -output_file ${mount_dir}/output/$outname ; chmod 666 ${mount_dir}/output/* "  ) >> archive/logs/$(date +"%Y%m%d")docker.log
 
     if [ -f archive/$basename ] && [ -f output/$outname ];then
       rm $i
