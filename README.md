@@ -1,24 +1,37 @@
 # vep
 
-Instructions:
-the script can be used without root rights. I would also highly recommend this. the user just has to be added to the docker group first with:
-sudo usermod -a -G docker $(whoami)
+## Prerequisites
+The script will check for the following prerequisites.
 
-make a new folder:
-mkdir foldername
+### Linux tools
+- wget 
+- tar 
+- docker 
+- pgrep 
+- gzip 
+- bgzip
 
-copy the script into that folder:
-https://github.com/overathm/vep
+### Disk space
+At least 30GB of disk space are required.
 
-make the script executable:
-chmod +x Run_VEP_batch_v0_5.sh
+## Instructions (initial setup)
+The script can be used without root rights. I would highly recommend this!
 
-and execute it with:
-./Run_VEP_batch_v0_5.sh
+### Add your vep user to the docker group
+`sudo usermod -a -G docker $(whoami)`
 
-After that the script will be executed hourly.
+### Clone the git repository
+`git clone https://github.com/overathm/vep`
 
-The following programmes are required:
-wget tar docker pgrep gzip bgzip
-and at least 30GB of memory is required.
-However, the progam indicates that there is not enough memory and that programs are not installed.
+### Make the script executable
+`chmod +x Run_VEP_batch_v0_5.sh`
+
+### Execute the script
+`./Run_VEP_batch_v0_5.sh`
+
+
+## Cron Job
+After the initial setup the script will be executed hourly through the cron facilities.
+
+
+mo
