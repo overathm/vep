@@ -24,10 +24,10 @@ The script can be used without root rights. I would highly recommend this!
 `git clone https://github.com/overathm/vep`
 
 ### Make the script executable
-`chmod +x Run_VEP_batch_v0_5.sh`
+`chmod +x Run_VEP_batch.sh`
 
 ### Execute the script
-`./Run_VEP_batch_v0_5.sh`
+`./Run_VEP_batch.sh`
 
 
 ## Cron Job
