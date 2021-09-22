@@ -9,7 +9,7 @@ The script will check for the following prerequisites.
 - docker 
 - pgrep 
 - gzip 
-- bgzip
+- bgzip (tabix on debian based linux distributions)
 
 ### Disk space
 At least 30GB of disk space are required.
