@@ -120,7 +120,7 @@ for f in $(find input/ -name '*\ *.vcf' -mmin +$waitperiod)
   done
 IFS=$SAVEIFS
 
-for i in $(find input/ -name '*.vcf')
+for i in $(find input/ -name '*.vcf' -mmin +$waitperiod)
   do
     #BASENAME=$( echo $i | cut -d'/' -f2)
     basename=${i##*/}
