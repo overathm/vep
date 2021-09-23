@@ -105,18 +105,22 @@ if [ $(df -P . | tail -1 | xargs | cut -d" " -f4) -lt 5000000 ];then
   printf "INFO: There is less then 5GB space left on your disk, please check\n"
 fi
 
+#for every file that ends with .vcf that stayed there for longer than timeout (that value is stored in the config)
 #check for whitespaces and repaces them with underscore
 SAVEIFS=$IFS
 IFS=$'\n'
-for f in $(find input/ -name '*\ *.vcf')
-do
-  mv "$f" "${f// /_}"
-  printf "I don't like whitespaces: $f is renamed to ${f// /_}"
-done
+for f in $(find input/ -name '*\ *.vcf' -mmin +$waitperiod)
+  do
+    basename=${f##*/}
+    basename=${basename// /_}
+    basename=${basename//(/}
+    basename=${basename//)/}
+    mv "$f" "input/$basename"
+    printf "I don't like whitespaces: $f is renamed to $basename\n"
+  done
 IFS=$SAVEIFS
 
-#for every file that ends with .vfc that stayed ther for longer than timeout (that value is stored in the config)
-for i in $(find input/ -name '*.vcf' -mmin +$waitperiod)
+for i in $(find input/ -name '*.vcf')
   do
     #BASENAME=$( echo $i | cut -d'/' -f2)
     basename=${i##*/}
