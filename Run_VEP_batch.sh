@@ -77,7 +77,7 @@ if [ ! -f "reference/${fasta}.fa.gz" ]; then
     exit
   else
     wget -P reference http://ftp.ensembl.org/pub/grch37/current/fasta/homo_sapiens/dna/${fasta}.fa.gz
-    gzip -d reference/${fasta}.fa.gz > reference/${fasta}.fa
+    gzip -d -c reference/${fasta}.fa.gz > reference/${fasta}.fa
     bgzip -c reference/${fasta}.fa > reference/${fasta}.fa.gz
   fi
 fi
