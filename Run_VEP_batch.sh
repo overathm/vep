@@ -128,7 +128,7 @@ for i in $(find input/ -name '*.vcf' -mmin +$waitperiod)
   do
     #BASENAME=$( echo $i | cut -d'/' -f2)
     basename=${i##*/}
-    basename_we=$( echo $basename | cut -d'.' -f1)
+    basename_we=$(basename $basename ".vcf")
     outname=${basename_we}_VEP_RefSeq.vcf
 
     cp $i archive
