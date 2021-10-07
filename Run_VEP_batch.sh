@@ -118,8 +118,8 @@ for f in $(find input/ -name '*\ *.vcf' -mmin +$waitperiod)
     mv "$f" "input/$basename"
     printf "I don't like whitespaces: $f is renamed to $basename\n"
     # Remove empty directories after files have been moved
-    if [ -f "input/$basename" ];then
-      rm -r "${f%/*}/"
+    if [ "${f%/*}/" != "input/" ];then
+      rmdir "${f%/*}/"
     fi
   done
 IFS=$SAVEIFS
